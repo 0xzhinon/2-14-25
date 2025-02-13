@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2-14-2025</title>
+    <style>
+        body {
+            background-color: pink;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+        .button-container {
+            position: relative;
+        }
+        .move-button {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            position: absolute;
+        }
+        .secret-button {
+            background-color: transparent;
+            border: none;
+            width: 5px;
+            height: 5px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            cursor: pointer;
+        }
+        .background-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 100px;
+            color: rgba(255, 0, 0, 0.1);
+            pointer-events: none;
+            white-space: pre-wrap; /* Allows for multi-line text */
+        }
+        .message {
+            font-size: 24px;
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .background-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 100px;
+            color: rgba(255, 0, 0, 0.1);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container">
+        <button class="move-button" onclick="moveButton()">Click Me!</button>
+    </div>
+    <button class="secret-button" onclick="goToSecretPage()"></button>
+
+    <script>
+        let clickCount = 0;
+        let distance = 50; // Initial distance
+        let lastX = 0;
+        let lastY = 0;
+
+        function moveButton() {
+            clickCount++;
+            if (clickCount >= 20) {
+                goToSecretPage();
+                return;
+            }
+
+            const button = document.querySelector('.move-button');
+            const container = document.querySelector('.button-container');
+            const containerRect = container.getBoundingClientRect();
+            const buttonRect = button.getBoundingClientRect();
+
+            const maxX = containerRect.width - buttonRect.width;
+            const maxY = containerRect.height - buttonRect.height;
+
+            let randomX = (lastX + distance) % maxX;
+            let randomY = (lastY + distance) % maxY;
+
+            button.style.left = `${randomX}px`;
+            button.style.top = `${randomY}px`;
+
+            // Update last position
+            lastX = randomX;
+            lastY = randomY;
+            // Play sound on button click
+            if (window.audio) {
+                window.audio.pause();
+                window.audio.currentTime = 0;
+            }
+            window.audio = new Audio('cli1.mp3');
+            window.audio.play();
+            // Increase the distance for the next move
+            distance += 1000;
+        }
+      
+
+// Play background music on page load
+window.addEventListener('load', () => {
+    window.backgroundAudio = new Audio('mu1.mp3');
+    window.backgroundAudio.loop = true;
+    window.backgroundAudio.play();
+});
+        function goToSecretPage() {
+            window.location.href = 'flapgame.html';
+        }
+    </script>
+</body>
+</html>

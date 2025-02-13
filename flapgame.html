@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2-14-2025</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: rgba(231, 190, 234, 0.7) no-repeat center center fixed;
+            background-size: cover;
+        }
+        canvas { 
+            display: block;
+            margin: auto;
+            background: transparent;
+        }
+        .scoreboard {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="scoreboard">Score: <span id="score">0</span></div>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const birdImg = new Image();
+        birdImg.src = 'yep.png';
+
+        const bird = {
+            x: 50,
+            y: 150,
+            width: 40,
+            height: 40,
+            gravity: 0.6,
+            lift: -15,
+            velocity: 0
+        };
+
+        const pipes = [];
+        const pipeWidth = 80;
+        const pipeGap = 580;
+        let frameCount = 0;
+        let score = 0;
+        let gameRunning = true; // Flag to control game loop
+        const audio = new Audio('fly.mp3');
+        audio.loop = true;
+
+        function drawBird() {
+            ctx.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+        }
+
+        function updateBird() {
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            if (bird.y + bird.height > canvas.height || bird.y < 0) {
+                resetGame();
+            }
+        }
+
+        function drawPipes() {
+            ctx.fillStyle = '#FF1493';
+            pipes.forEach(pipe => {
+                ctx.fillRect(pipe.x, 0, pipeWidth, pipe.top);
+                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipeWidth, pipe.bottom);
+            });
+        }
+
+        function updatePipes() {
+            if (frameCount % 90 === 0) {
+                const top = Math.random() * (canvas.height - pipeGap);
+                const bottom = canvas.height - top - pipeGap;
+                pipes.push({ x: canvas.width, top, bottom });
+            }
+            bird.width = 80;
+            bird.height = 80;
+            pipes.forEach((pipe, index) => {
+                pipe.x -= 2;
+
+                if (pipe.x + pipeWidth < 0) {
+                    pipes.splice(index, 1);
+                    score++;
+                    scoreElement.textContent = score;
+
+                    // Check if the player passed
+                    if (score >= 20) {
+                        gameRunning = false; // Stop the game loop
+                        audio.loop = true;
+                        audio.play();
+
+                      
+                        alert('File corrupted! This program has been manipulated and maybe it\'s infected by a Virus or cracked. This file won\'t work anymore.');
+                        const alertAudio = new Audio('bom1.mp3');
+                        alertAudio.play();
+                        window.location.href = 'to flower.html'; // Change URL
+
+                    }
+                }
+
+                if (
+                    bird.x < pipe.x + pipeWidth &&
+                    bird.x + bird.width > pipe.x &&
+                    (bird.y < pipe.top || bird.y + bird.height > canvas.height - pipe.bottom)
+                ) {
+                    resetGame();
+                }
+            });
+        }
+
+        function resetGame() {
+            bird.y = 150;
+            bird.velocity = 0;
+            pipes.length = 0;
+            score = 0;
+            frameCount = 0;
+            scoreElement.textContent = score;
+            audio.currentTime = 0; // Reset audio playback
+            audio.play(); // Play audio again
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return; // Stop loop if player wins
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBird();
+            updateBird();
+            drawPipes();
+            updatePipes();
+            frameCount++;
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('keydown', () => {
+            bird.velocity = bird.lift;
+        });
+
+        birdImg.onload = () => {
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
